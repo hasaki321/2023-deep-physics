@@ -7,10 +7,10 @@ class MLP(nn.Module):
         self.input_size = input_size
 
         self.fnn1 = nn.Sequential(
-            nn.Linear(input_size,32),
+            nn.Linear(input_size,96),
             nn.ELU(),
-            nn.BatchNorm1d(32),
-            nn.Linear(32,1),
+            nn.BatchNorm1d(96),
+            nn.Linear(96,1),
         )
 
     def forward(self, x):
