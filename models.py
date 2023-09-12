@@ -17,7 +17,7 @@ class MLP(nn.Module):
         out = self.fnn1(x)
         return out
 
-class AE-MLP(nn.Module):
+class AE_MLP(nn.Module):
     def __init__(self, input_size,hid_feature,Linear_size1,Linear_size2):
         super().__init__()
         self.input_size = input_size
