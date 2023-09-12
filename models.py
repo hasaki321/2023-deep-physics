@@ -17,10 +17,7 @@ class MLP(nn.Module):
         out = self.fnn1(x)
         return out
 
-def KlLoss(mu,logvar):
-    return -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-
-class MLP(nn.Module):
+class AE-MLP(nn.Module):
     def __init__(self, input_size,hid_feature,Linear_size1,Linear_size2):
         super().__init__()
         self.input_size = input_size
@@ -54,13 +51,6 @@ class MLP(nn.Module):
             nn.Linear(Linear_size1,1),
         )
     
-    def reparameterize(self,hid):
-        mu,logvar = hid[:,hid_feature//2:],hid[:,:hid_feature//2]
-        std = torch.exp(0.5*logvar)
-        eps = torch.randn_like(std)
-        z = mu + eps*std
-        return mu,logvar,z
-
     def forward(self, x):
         hid = self.encoder(x)
         out = self.decoder(hid)
