@@ -28,12 +28,11 @@ def test_MLP(test_loader,model,fold,criterion):
     model.eval()
     test_losses = []
     with torch.no_grad():  
-        for (inputs, labels) in test_loader:
+        for i,(inputs, labels) in enumerate(test_loader):
             labels = labels 
             outputs = model(inputs)
-
             loss = criterion(outputs, labels.unsqueeze(1))
-        test_losses.append(loss.item())
+            test_losses.append(loss.item())
         test_loss = sum(test_losses)/len(test_losses)
         rmse = test_loss**0.5
         print(f'Test Loss: {test_loss:.10f}, Test RMSE: {rmse:.10f}') 
