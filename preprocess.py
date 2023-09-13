@@ -23,7 +23,7 @@ class dataset(Dataset):
         
         
         self.data = data[:,:5].astype(np.float32)
-        self.target = data[:,-4].astype(np.float32)
+        self.target = data[:,-1].astype(np.float32)
         
         
     def __getitem__(self,idx):
