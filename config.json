@@ -1,0 +1,13 @@
+[
+  {
+    "Type": "odd",
+    "N_size": "<126",
+    "model": "MLP",
+    "num_epoch": 100,
+    "lr": 0.1,
+    "k": 10,
+    "alpha": 0.1,
+    "beta": 0.9,
+    "input_size":5
+  }
+]
