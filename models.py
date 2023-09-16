@@ -1,9 +1,9 @@
 import torch.nn as nn
 import torch
 
-class MLP(nn.Module):
+class FM_MLP(nn.Module):
     def __init__(self, input_size,Linear_size):
-        super(MLP, self).__init__()
+        super(FM_MLP, self).__init__()
         self.input_size = input_size
 
         self.fnn1 = nn.Sequential(
