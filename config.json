@@ -5,9 +5,24 @@
     "model": "FM_MLP",
     "num_epoch": 100,
     "lr": 0.1,
+    "decay":1e-2,
     "k": 10,
-    "alpha": 0.1,
-    "beta": 0.9,
-    "input_size":5
+    "alpha": 0,
+    "input_size":5,
+    "L1":16,
+    "L2":""
+  },
+  {
+    "Type": "odd",
+    "N_size": "<126",
+    "model": "AE_MLP",
+    "num_epoch": 100,
+    "lr": 0.1,
+    "decay":1e-2,
+    "k": 10,
+    "alpha": 0.5,
+    "input_size":5,
+    "L1":16,
+    "L2":32
   }
 ]
