@@ -17,7 +17,8 @@ fix：
 	可以自选 scaler
 
 未完成：
-	hid feature
+	
+ 	hid feature
 	
 	训练方式 3
 
