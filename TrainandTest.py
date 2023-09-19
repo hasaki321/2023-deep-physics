@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-import panda as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from preprocess import dataset
 from sklearn.preprocessing import MinMaxScaler,StandardScaler
@@ -37,7 +37,7 @@ def pre_training(model,criterion,alpha,optimizer,epoch,lr_scheduler,para_path,de
                 if loss.item() < best and idx > epoch * 0.95:
                     best = loss.item()
                     torch.save(model.state_dict(), f'{para_path}/model.ckpt')
-                    print(f"loss:{loss.item()} saving...")
+#                     print(f"loss:{loss.item()} saving...")
 
             loss.backward()
             optimizer.step()
@@ -62,7 +62,7 @@ def train_MLP(train_loader,model,criterion,alpha,optimizer,epoch,fold,lr_schedul
             if loss.item()<best and idx>epoch*0.95:
                 best = loss.item()
                 torch.save(model.state_dict(), f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt')
-                print(f"loss:{loss.item()} saving...")
+#                 print(f"loss:{loss.item()} saving...")
 
         loss.backward()
         optimizer.step()
