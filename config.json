@@ -8,7 +8,7 @@
     "decay":0,
     "k": 10,
     "alpha": 0.1,
-    "input_size":5,
+    "input_size":9,
     "L1":8,
     "L2":16
   },
@@ -21,7 +21,7 @@
     "decay":0.0001,
     "k": 4,
     "alpha": 0,
-    "input_size":5,
+    "input_size":9,
     "L1":56,
     "L2":0
   },

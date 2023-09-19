@@ -16,13 +16,14 @@ class dataset(Dataset):
         
         if Type == 'odd':
             data = data[np.intersect1d(np.where(data[:,2]%2==1),np.where(data[:,1]%2==1) )]
+            data = np.delete(data, [4, 5, 6], axis=1)
         elif Type == 'even':
             data = data[np.intersect1d(np.where(data[:,2]%2==0),np.where(data[:,1]%2==0))]
         else:
             data = data[np.where((data[:,2]+data[:,1])%2==1)]
-        
-        
+
         self.data = data[:,:input_size].astype(np.float32)
+
         if scaler:
             self.data = scaler.fit_transform(self.data)
         
@@ -43,3 +44,10 @@ def get_Kfold(file,k,shuffle=True):
         np.random.shuffle(data) 
     num = len(data)//k
     return [(np.concatenate((data[0:num*i],data[num*(i+1):len(data)])),data[num*i:num*(i+1)]) for i in range(k)]
+
+def get_scheduler(optimizer,num_epoch,flag):
+    if flag != 1:
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda x: 1 - x / num_epoch, last_epoch=-1)
+    else :
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.95, patience=10)
+    return scheduler

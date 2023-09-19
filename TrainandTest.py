@@ -16,7 +16,7 @@ def loss_fn(criterion,alpha,inputs,outputs,labels):
     #alse return mse
     return loss,mse
     
-def pre_training(model,criterion,alpha,optimizer,epoch,lr_scheduler,para_path,device,flag):
+def pre_training(model,criterion,alpha,optimizer,epoch,scheduler,para_path,device,flag):
     if flag == 5 :
         scaler = MinMaxScaler()
         pre_traindata = pd.read_excel('./data/test 3.xlsx',engine="openpyxl")
@@ -34,19 +34,19 @@ def pre_training(model,criterion,alpha,optimizer,epoch,lr_scheduler,para_path,de
                 # change into a loss function
                 loss, _ = loss_fn(criterion, alpha, inputs, outputs, labels)
 
-                if loss.item() < best and idx > epoch * 0.95:
+                if loss.item() < best and idx > epoch * 0.5:
                     best = loss.item()
                     torch.save(model.state_dict(), f'{para_path}/model.ckpt')
-#                     print(f"loss:{loss.item()} saving...")
+ #                   print(f"loss:{loss.item()} saving...")
 
             loss.backward()
             optimizer.step()
 
-        lr_scheduler.step()
+        scheduler.step()
 
     model.load_state_dict(torch.load(f'{para_path}/model.ckpt'))
 
-def train_MLP(train_loader,model,criterion,alpha,optimizer,epoch,fold,lr_scheduler,para_path,device,flag):
+def train_MLP(train_loader,model,criterion,alpha,optimizer,epoch,fold,scheduler,para_path,device,flag):
     losses = []
     best = 100
     for idx in range(epoch):
@@ -59,16 +59,19 @@ def train_MLP(train_loader,model,criterion,alpha,optimizer,epoch,fold,lr_schedul
             #change into a loss function
             loss,_ = loss_fn(criterion,alpha,inputs,outputs,labels)
             
-            if loss.item()<best and idx>epoch*0.95:
+            if loss.item()<best and idx>epoch*0.5:
                 best = loss.item()
                 torch.save(model.state_dict(), f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt')
-#                 print(f"loss:{loss.item()} saving...")
+#                print(f"loss:{loss.item()} saving...")
 
         loss.backward()
         optimizer.step()
 
     losses.append(loss.item())
-    lr_scheduler.step()
+    if flag != 1:
+        scheduler.step()
+    else:
+        scheduler.step(loss)
 
 def test_MLP(test_loader,model,fold,criterion,alpha,plot,para_path,device,flag):
     model.load_state_dict(torch.load(f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt'))
@@ -87,14 +90,16 @@ def test_MLP(test_loader,model,fold,criterion,alpha,plot,para_path,device,flag):
             #separate loss and mse here
             test_mses.append(mse.item())
             test_losses.append(loss.item())
-        total_mse = sum(test_mses)/len(test_losses)
-        rmse = total_mse**0.5
-        print(f'Test Loss: {total_mse:.5f}, Test RMSE: {rmse:.5f}')
+
+        total_len_mse = sum(test_mses)
+        mse = total_len_mse/len(test_mses)
+        rmse = sum(test_mses)/len(test_mses)**0.5
+        print(f'Test Loss: {mse:.5f}, Test RMSE: {rmse:.5f}')
     if plot:
         test = np.array(torch.stack(test).cpu()).reshape(-1)
         test_output = np.array(torch.stack(test_output).cpu()).reshape(-1)
         plt.scatter(test,test)
         plt.scatter(test,test_output)
         plt.show()
-    return total_mse,rmse
+    return total_len_mse,rmse
    
