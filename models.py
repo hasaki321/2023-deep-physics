@@ -1,9 +1,15 @@
 import torch.nn as nn
 import torch
 
-class MLP(nn.Module):
+def get_models(model,input_size,L1,L2):
+    if model=='FM_MLP':
+        return FM_MLP(input_size,L1)
+    elif model == 'AE_MLP':
+        return AE_MLP(input_size,32,L1,L2)
+
+class FM_MLP(nn.Module):
     def __init__(self, input_size,Linear_size):
-        super(MLP, self).__init__()
+        super(FM_MLP, self).__init__()
         self.input_size = input_size
 
         self.fnn1 = nn.Sequential(

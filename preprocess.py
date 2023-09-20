@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 class dataset(Dataset):
-    def __init__(self,data,Type,N_size):
+    def __init__(self,data,Type,N_size,input_size,scaler):
         super().__init__()
         index = np.lexsort((data[:,2],))
         data = data[index]
@@ -22,8 +22,11 @@ class dataset(Dataset):
             data = data[np.where((data[:,2]+data[:,1])%2==1)]
         
         
-        self.data = data[:,:5].astype(np.float32)
-        self.target = data[:,-4].astype(np.float32)
+        self.data = data[:,:input_size].astype(np.float32)
+        if scaler:
+            self.data = scaler.fit_transform(self.data)
+        
+        self.target = data[:,-1].astype(np.float32)
         
         
     def __getitem__(self,idx):
