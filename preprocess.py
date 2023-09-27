@@ -9,6 +9,7 @@ class dataset(Dataset):
         index = np.lexsort((data[:,2],))
         data = data[index]
         data = np.array(data)
+        
         if N_size == '<126':
             data = data[np.where(data[:,2]<126)]
         else:
@@ -23,6 +24,7 @@ class dataset(Dataset):
         
         
         self.data = data[:,:input_size].astype(np.float32)
+        self.origin = self.data
         if scaler:
             self.data = scaler.fit_transform(self.data)
         
@@ -30,7 +32,7 @@ class dataset(Dataset):
         
         
     def __getitem__(self,idx):
-        return self.data[idx],self.target[idx]
+        return self.data[idx],self.target[idx],self.origin[idx]
     
     def __len__(self):
         return len(self.data)

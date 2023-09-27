@@ -25,7 +25,7 @@ def pre_training(model,criterion,alpha,optimizer,epoch,lr_scheduler,para_path,de
 
         best = 100
         for idx in range(epoch):
-            for i, (inputs, labels) in enumerate(pre_traindata):
+            for i, (inputs, labels,_) in enumerate(pre_traindata):
                 inputs, labels = inputs.to(device), labels.to(device)
 
                 optimizer.zero_grad()
@@ -50,7 +50,7 @@ def train_MLP(train_loader,model,criterion,alpha,optimizer,epoch,fold,lr_schedul
     losses = []
     best = 100
     for idx in range(epoch):
-        for i, (inputs, labels) in enumerate(train_loader):
+        for i, (inputs, labels,_) in enumerate(train_loader):
             inputs, labels = inputs.to(device), labels.to(device)
             
             optimizer.zero_grad()
@@ -76,7 +76,7 @@ def test_MLP(test_loader,model,fold,criterion,alpha,plot,para_path,device,flag):
     test_mses,test_losses,test_output,test = [],[],[],[]
     
     with torch.no_grad():  
-        for i,(inputs, labels) in enumerate(test_loader):
+        for i,(inputs, labels,origin) in enumerate(test_loader):
             inputs, labels = inputs.to(device), labels.to(device)
             
             outputs = model(inputs)
@@ -90,11 +90,12 @@ def test_MLP(test_loader,model,fold,criterion,alpha,plot,para_path,device,flag):
         total_mse = sum(test_mses)/len(test_losses)
         rmse = total_mse**0.5
         print(f'Test Loss: {total_mse:.5f}, Test RMSE: {rmse:.5f}')
+    test = np.array(torch.stack(test).cpu()).reshape(-1)
+    test_output = np.array(torch.stack(test_output).cpu()).reshape(-1)
     if plot:
-        test = np.array(torch.stack(test).cpu()).reshape(-1)
-        test_output = np.array(torch.stack(test_output).cpu()).reshape(-1)
+        
         plt.scatter(test,test)
         plt.scatter(test,test_output)
         plt.show()
-    return total_mse,rmse
+    return total_mse,rmse,np.concatenate((origin,np.expand_dims(labels.cpu(), axis=1),np.expand_dims(test_output, axis=1)),axis=1)
    
