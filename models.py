@@ -10,6 +10,9 @@ def get_models(model,input_size,epsilon):
         return SVR_model
     elif model == 'AE_MLP':
         return AE_MLP(input_size)
+    
+    elif model == 'MLP':
+        return MLP(input_size)
 
 class AE_MLP(nn.Module):
     def __init__(self, input_size):
@@ -48,5 +51,32 @@ class AE_MLP(nn.Module):
         out = self.decoder(hid)
         y = self.predicter(hid)
         return out,y
+    
+class MLP(nn.Module):
+    def __init__(self, input_size):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_size,8),
+            nn.ELU(),
+            nn.BatchNorm1d(8),
+            nn.Linear(8,16),
+            nn.ELU(),
+            nn.Linear(16,32),
+        )
+        
+        self.predicter = nn.Sequential(
+            nn.Linear(32,16),
+            nn.ReLU(),
+            nn.BatchNorm1d(16),
+            nn.Linear(16,8),
+            nn.ELU(),
+            nn.BatchNorm1d(8),
+            nn.Linear(8,1),
+        )
+    
+    def forward(self, x):
+        hid = self.encoder(x)
+        y = self.predicter(hid)
+        return y
         
 

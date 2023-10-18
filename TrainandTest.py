@@ -18,16 +18,21 @@ def train_MLP(X_train,y_train,model,lr,alpha,fold,para_path,flag):
         batch_size = X_train.shape[0]
         train_loader = torch.utils.data.DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
         losses = []
-        bar = range(100)
+        bar = range(500)
         best = 100
         for idx, epoch in enumerate(bar):
             for i, (inputs, labels) in enumerate(train_loader):
                 labels = labels
                 optimizer.zero_grad()
-                out, y = model(inputs)
-                label_loss = criterion(y, labels.unsqueeze(1))
-                recon_loss = criterion(out, inputs)
-                loss = alpha * recon_loss + (1-alpha) * label_loss
+                try:
+                    out, y = model(inputs)
+                    label_loss = criterion(y, labels.unsqueeze(1))
+                    recon_loss = criterion(out, inputs)
+                    loss = alpha * recon_loss + (1-alpha) * label_loss
+                except:
+                    y = model(inputs)
+                    label_loss = criterion(y, labels.unsqueeze(1))
+                    loss = label_loss
                 if idx > 100 * 0.5 and loss.item() < best:
                     best = loss.item()
                     torch.save(model.state_dict(), f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt')
@@ -50,7 +55,10 @@ def test_MLP(X_test,y_test,model,fold,para_path,scaler,results_df,l,flag):
         model.load_state_dict(torch.load(f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt'))
         model.eval()
         with torch.no_grad():
-            _, test_outputs = model(X_test)
+            try:
+                _, test_outputs = model(X_test)
+            except:
+                test_outputs = model(X_test)
             y_pred = test_outputs.to('cpu')
             y_pred = np.array(y_pred)
         X_test = scaler.inverse_transform(X_test)
