@@ -3,10 +3,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from preprocess import dataset
+from models import *
 from sklearn.preprocessing import MinMaxScaler,StandardScaler
 import joblib
 from torch import optim
 import torch.nn as nn
+
+sigma = 0.0005
+
+def l1_reg(model):
+    param_squared_sums = {}
+#     for name, param in model.named_parameters():
+    encoder_parameters = list(filter(lambda x: x[0].startswith('encoder') or x[0].startswith('decoder'),list(model.named_parameters())))
+    for name, param in encoder_parameters:
+        if 'weight' in name:
+            param_squared_sums[name] = torch.sum(torch.abs(param))
+    return sum(param_squared_sums.values())
+
 
 def train_MLP(X_train,y_train,model,lr,alpha,fold,para_path,flag):
 
@@ -24,15 +37,16 @@ def train_MLP(X_train,y_train,model,lr,alpha,fold,para_path,flag):
             for i, (inputs, labels) in enumerate(train_loader):
                 labels = labels
                 optimizer.zero_grad()
-                try:
+                if isinstance(model,AE_MLP):
                     out, y = model(inputs)
                     label_loss = criterion(y, labels.unsqueeze(1))
                     recon_loss = criterion(out, inputs)
                     loss = alpha * recon_loss + (1-alpha) * label_loss
-                except:
+                else:
                     y = model(inputs)
                     label_loss = criterion(y, labels.unsqueeze(1))
                     loss = label_loss
+                loss+= sigma*l1_reg(model)
                 if idx > 100 * 0.5 and loss.item() < best:
                     best = loss.item()
                     torch.save(model.state_dict(), f'{para_path}/model_{flag + 1}_fold_{fold + 1}.ckpt')
